@@ -7,7 +7,7 @@ module.exports = {
       name: name,
       description: description,
     });
-    createUser.save();
+    createRole.save();
     res.status(200).send({ message: "data saved successfully" });
   },
 };
