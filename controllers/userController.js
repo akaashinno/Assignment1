@@ -6,6 +6,7 @@ module.exports = {
   addUser: async (req, res) => {
     try {
       const {
+        roleId,
         username,
         password,
         confirmPassword,
@@ -18,23 +19,19 @@ module.exports = {
         const securePassword = await bcrypt.hash(password, salt);
 
         const createUser = await User.create({
+          roleId,
           username,
           password: securePassword,
           emailId,
           firstName,
           lastName,
         });
-        // throw err;
         createUser.save();
         res.status(200).send({
           message: "data saved successfully",
-          //   username,
-          //   emailId,
-          //   firstName,
-          //   lastName,
         });
       } else {
-        res.send("Password not matched");
+        res.status(500).send("Confirm Password not matched");
       }
     } catch (err) {
       console.log("Error occurred:", err.status);
