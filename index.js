@@ -10,6 +10,7 @@ const roleRouter = require("./routes/route");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use("/role", roleRouter);
+
 const port = 5000;
 app.listen(port, () =>
   console.log(`Server running at http://localhost : ${port}`)
