@@ -1,6 +1,8 @@
 const User = require("../models/users");
 const sequelize = require("../database/db");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const jwtSecret = "akash@456$inno";
 
 module.exports = {
   addUser: async (req, res) => {
@@ -18,7 +20,7 @@ module.exports = {
         const salt = await bcrypt.genSalt(10);
         const securePassword = await bcrypt.hash(password, salt);
 
-        const createUser = await User.create({
+        await User.create({
           roleId,
           username,
           password: securePassword,
@@ -26,7 +28,6 @@ module.exports = {
           firstName,
           lastName,
         });
-        createUser.save();
         res.status(200).send({
           message: "data saved successfully",
         });
@@ -36,6 +37,37 @@ module.exports = {
     } catch (err) {
       console.log("Error occurred:", err.status);
       res.status(500).send({ message: "Internal server error" });
+    }
+  },
+
+  login: async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+      const user = await User.findOne({
+        where: {
+          username,
+        },
+      });
+      if (!user) {
+        return res.status(400).json({ message: "Invalid credentials" });
+      }
+
+      const passwordCompare = await bcrypt.compare(password, user.password);
+      if (!passwordCompare) {
+        return res.status(400).json({ message: "Invalid credentials" });
+      }
+
+      const data = {
+        user: {
+          id: user.id,
+        },
+      };
+      const access_token = jwt.sign(data, jwtSecret);
+
+      return res.status(200).json({ access_token });
+    } catch (error) {
+      return res.status(500).json({ message: "An error occurred" });
     }
   },
 };

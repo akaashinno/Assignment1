@@ -12,6 +12,7 @@ sequelize.sync({ models: [roles, users] });
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
 app.use("/role", roleRouter);
 
 app.use("/user", userRouter);
