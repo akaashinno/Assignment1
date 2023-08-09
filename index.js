@@ -8,6 +8,9 @@ const users = require("./models/users");
 const roleRouter = require("./routes/route");
 const userRouter = require("./routes/userRoute");
 
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+
 sequelize.sync({ models: [roles, users] });
 
 app.use(bodyParser.urlencoded({ extended: false }));
