@@ -1,6 +1,7 @@
 const User = require("../models/users");
 const sequelize = require("../database/db");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 module.exports = {
   addUser: async (req, res) => {
@@ -61,11 +62,12 @@ module.exports = {
           id: user.id,
         },
       };
-      const access_token = jwt.sign(data, process.env.jwtSecret);
+      const access_token = jwt.sign(data, process.env.JWTSECRET);
 
-      return res.status(200).json({ access_token });
+      res.status(200).json({ access_token });
     } catch (error) {
-      return res.status(500).json({ message: "An error occurred" });
+      console.log(error);
+      res.status(500).json({ message: "An error occurred" });
     }
   },
 };
