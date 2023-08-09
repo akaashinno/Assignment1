@@ -2,7 +2,7 @@ const User = require("../models/users");
 const sequelize = require("../database/db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const jwtSecret = "akash@456$inno";
+require("dotenv").config();
 
 module.exports = {
   addUser: async (req, res) => {
@@ -63,7 +63,7 @@ module.exports = {
           id: user.id,
         },
       };
-      const access_token = jwt.sign(data, jwtSecret);
+      const access_token = jwt.sign(data, process.env.jwtSecret);
 
       return res.status(200).json({ access_token });
     } catch (error) {
