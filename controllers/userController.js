@@ -70,4 +70,58 @@ module.exports = {
       res.status(500).json({ message: "An error occurred" });
     }
   },
+
+  getUser: async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const user = await User.findOne({
+        where: {
+          id: userId,
+        },
+        attributes: { exclude: ["password"] },
+      });
+      res.status(200).send(user);
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send("internal server error");
+    }
+  },
+
+  deleteUser: async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const user = await User.findOne({
+        where: {
+          id: userId,
+        },
+      });
+      await user.destroy();
+      // res.send(user);
+      res.status(200).send({ message: "user deleted succesfully" });
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send("internal server error");
+    }
+  },
+
+  userList: async (req, res) => {
+    try {
+      const page = req.params.page;
+      // console.log(page);
+      const limit = 10;
+      const skip = (page - 1) * limit;
+      // console.log(skip);
+      const users = await User.findAll({
+        attributes: { exclude: ["password"] },
+        limit,
+        offset: skip,
+      });
+      // console.log(users);
+      // res.send("found");
+      res.status(200).send(users);
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Internal server error");
+    }
+  },
 };
