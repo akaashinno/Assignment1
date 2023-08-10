@@ -80,7 +80,7 @@ module.exports = {
         },
         attributes: { exclude: ["password"] },
       });
-      res.send(user);
+      res.status(200).send(user);
     } catch (error) {
       console.error(error.message);
       res.status(500).send("internal server error");
