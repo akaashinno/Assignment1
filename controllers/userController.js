@@ -83,14 +83,20 @@ module.exports = {
 
   getUser: async (req, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.params.id;
+      console.log(userId);
       const user = await User.findOne({
         where: {
           id: userId,
         },
         attributes: { exclude: ["password"] },
       });
-      res.status(200).send(user);
+      const userAddress = await Address.findAll({
+        where: {
+          user_id: userId,
+        },
+      });
+      res.status(200).send({ user, userAddress });
     } catch (error) {
       console.error(error.message);
       res.status(500).send("internal server error");
