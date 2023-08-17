@@ -36,8 +36,8 @@ module.exports = {
         res.status(500).send("Confirm Password not matched");
       }
     } catch (err) {
-      console.log("Error occurred:", err.status);
-      res.status(500).send({ message: "Internal server error" });
+      // console.log("Error occurred:", err.status);
+      res.status(500).send({ err: "error" });
     }
   },
 
@@ -71,7 +71,7 @@ module.exports = {
           access_token: token,
           expiry: exTime,
         });
-        res.status(200).send(`${token}: token saved successfully`);
+        res.status(200).send({ token: "token saved successfully" });
       } else {
         return res.status(400).json({ message: "Invalid credentials" });
       }

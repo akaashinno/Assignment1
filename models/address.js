@@ -10,12 +10,30 @@ const Address = sequelize.define("Addresses", {
       key: "id",
     },
   },
-  address: Sequelize.STRING,
-  city: Sequelize.STRING,
-  state: Sequelize.STRING,
-  pin_code: Sequelize.INTEGER,
-  phone_number: Sequelize.INTEGER,
-  type: Sequelize.STRING,
+  address: {
+    Type: Sequelize.STRING,
+    allowNull: false,
+  },
+  city: {
+    Type: Sequelize.STRING,
+    allowNull: false,
+  },
+  state: {
+    Type: Sequelize.STRING,
+    allowNull: false,
+  },
+  pin_code: {
+    Type: Sequelize.INTEGER,
+    allowNull: false,
+  },
+  phone_number: {
+    Type: Sequelize.INTEGER,
+    allowNull: false,
+  },
+  type: {
+    Type: Sequelize.STRING,
+    allowNull: false,
+  },
 });
 
 Address.belongsTo(User, { foreignKey: "user_id" });
