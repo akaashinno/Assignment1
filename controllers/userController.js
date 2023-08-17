@@ -71,7 +71,7 @@ module.exports = {
           access_token: token,
           expiry: exTime,
         });
-        res.status(200).send("token saved successfully");
+        res.status(200).send(`${token}: token saved successfully`);
       } else {
         return res.status(400).json({ message: "Invalid credentials" });
       }
