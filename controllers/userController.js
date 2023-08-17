@@ -1,7 +1,9 @@
 const User = require("../models/users");
+const Address = require("../models/address");
 const sequelize = require("../database/db");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+let crypto = require("crypto");
+const Access_Token = require("../models/access_token");
 
 module.exports = {
   addUser: async (req, res) => {
@@ -41,7 +43,7 @@ module.exports = {
 
   login: async (req, res) => {
     const { username, password } = req.body;
-
+    // console.log(username, password);
     try {
       const user = await User.findOne({
         where: {
@@ -53,34 +55,48 @@ module.exports = {
       }
 
       const passwordCompare = await bcrypt.compare(password, user.password);
-      if (!passwordCompare) {
+      // console.log(passwordCompare);
+      if (passwordCompare) {
+        const { id: user_id, username: foundedUsername } = user;
+
+        let token = crypto
+          .createHash("md5")
+          .update(foundedUsername)
+          .digest("hex");
+
+        const exTime = new Date();
+
+        await Access_Token.create({
+          user_id,
+          access_token: token,
+          expiry: exTime,
+        });
+        res.status(200).send(`${token}: token saved successfully`);
+      } else {
         return res.status(400).json({ message: "Invalid credentials" });
       }
-
-      const data = {
-        user: {
-          id: user.id,
-        },
-      };
-      const access_token = jwt.sign(data, process.env.JWTSECRET);
-
-      res.status(200).json({ access_token });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ message: "An error occurred" });
+      res.status(500).json({ message: "An login error occurred" });
     }
   },
 
   getUser: async (req, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.params.id;
+      console.log(userId);
       const user = await User.findOne({
         where: {
           id: userId,
         },
         attributes: { exclude: ["password"] },
       });
-      res.status(200).send(user);
+      const userAddress = await Address.findAll({
+        where: {
+          user_id: userId,
+        },
+      });
+      res.status(200).send({ user, userAddress });
     } catch (error) {
       console.error(error.message);
       res.status(500).send("internal server error");
@@ -96,7 +112,6 @@ module.exports = {
         },
       });
       await user.destroy();
-      // res.send(user);
       res.status(200).send({ message: "user deleted succesfully" });
     } catch (error) {
       console.error(error.message);
@@ -107,21 +122,39 @@ module.exports = {
   userList: async (req, res) => {
     try {
       const page = req.params.page;
-      // console.log(page);
       const limit = 10;
       const skip = (page - 1) * limit;
-      // console.log(skip);
       const users = await User.findAll({
         attributes: { exclude: ["password"] },
         limit,
         offset: skip,
       });
-      // console.log(users);
-      // res.send("found");
       res.status(200).send(users);
     } catch (error) {
       console.error(error.message);
       res.status(500).send("Internal server error");
+    }
+  },
+  addAddress: async (req, res) => {
+    try {
+      const { address, city, state, pinCode, phoneNum, type } = req.body;
+      const data = req.tokenData;
+
+      await Address.create({
+        user_id: data.user_id,
+        address,
+        city,
+        state,
+        pinCode,
+        phoneNum,
+        type,
+      });
+      res.status(200).send({
+        message: "address saved successfully",
+      });
+    } catch (err) {
+      console.log("Error occurred:", err);
+      res.status(500).send({ message: "Internal server error" });
     }
   },
 };

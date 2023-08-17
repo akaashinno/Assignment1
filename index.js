@@ -5,12 +5,15 @@ const sequelize = require("./database/db");
 
 const roles = require("./models/roles");
 const users = require("./models/users");
+const access_token = require("./models/access_token");
+const address = require("./models/address");
+
 const roleRouter = require("./routes/route");
 const userRouter = require("./routes/userRoute");
 
 require("dotenv").config();
 
-sequelize.sync({ models: [roles, users] });
+sequelize.sync({ models: [roles, users, access_token, address] });
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
