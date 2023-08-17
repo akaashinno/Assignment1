@@ -37,7 +37,7 @@ module.exports = {
       }
     } catch (err) {
       // console.log("Error occurred:", err.status);
-      res.status(500).send({ err: "error" });
+      res.status(500).send(err);
     }
   },
 
@@ -71,7 +71,7 @@ module.exports = {
           access_token: token,
           expiry: exTime,
         });
-        res.status(200).send({ token: "token saved successfully" });
+        res.status(200).send(token);
       } else {
         return res.status(400).json({ message: "Invalid credentials" });
       }
