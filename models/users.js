@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../database/db");
 const Role = require("./roles");
+const Address = require("./address");
 
 const User = sequelize.define("users", {
   id: {
@@ -40,5 +41,6 @@ const User = sequelize.define("users", {
 });
 
 User.belongsTo(Role, { foreignKey: "roleId" });
+User.hasMany(Address, { foreignKey: "user_id" });
 
 module.exports = User;

@@ -12,7 +12,7 @@ const {
   userList,
   addAddress,
   deleteAddress,
-  forgotPassword,
+  // forgotPassword,
 } = require("../controllers/userController");
 
 router.post("/add", addUser);
