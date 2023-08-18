@@ -55,7 +55,6 @@ module.exports = {
       }
 
       const passwordCompare = await bcrypt.compare(password, user.password);
-      // console.log(passwordCompare);
       if (passwordCompare) {
         const { id: user_id, username: foundedUsername } = user;
 
@@ -157,4 +156,32 @@ module.exports = {
       res.status(500).send({ message: "Internal server error" });
     }
   },
+  deleteAddress: async (req, res) => {
+    try {
+      const data = req.body.addressArray;
+      for (const addressId of data) {
+        const user_address = await Address.findOne({
+          where: {
+            user_id: req.params.id,
+            id: addressId,
+          },
+        });
+        await user_address.destroy();
+      }
+      res.status(200).send({
+        message: "address deleted successfully",
+      });
+    } catch (err) {
+      console.log("Error occurred:", err);
+      res.status(500).send({ message: "Internal server error" });
+    }
+  },
+  // forgotPassword: (req, res) => {
+  //   try {
+  //   } catch (error) {}
+  // },
+  // verifyResetPassword: (req, res) => {
+  //   try {
+  //   } catch (error) {}
+  // },
 };

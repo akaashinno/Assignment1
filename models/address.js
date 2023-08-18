@@ -11,27 +11,25 @@ const Address = sequelize.define("Addresses", {
     },
   },
   address: {
-    Type: Sequelize.STRING,
+    type: Sequelize.STRING,
     allowNull: false,
   },
   city: {
-    Type: Sequelize.STRING,
+    type: Sequelize.STRING,
     allowNull: false,
   },
   state: {
-    Type: Sequelize.STRING,
+    type: Sequelize.STRING,
     allowNull: false,
   },
   pin_code: {
-    Type: Sequelize.INTEGER,
-    allowNull: false,
+    type: Sequelize.INTEGER,
   },
   phone_number: {
-    Type: Sequelize.INTEGER,
-    allowNull: false,
+    type: Sequelize.INTEGER,
   },
   type: {
-    Type: Sequelize.STRING,
+    type: Sequelize.STRING,
     allowNull: false,
   },
 });
