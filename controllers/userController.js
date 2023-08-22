@@ -17,7 +17,7 @@ module.exports = {
         lastName,
         roleId,
       } = req.body;
-      if (password == confirmPassword) {
+      if (password === confirmPassword) {
         const salt = await bcrypt.genSalt(10);
         const securePassword = await bcrypt.hash(password, salt);
 
@@ -29,7 +29,10 @@ module.exports = {
           lastName,
           roleId,
         });
-        res.status(200).send(createUser);
+        res.status(200).send({
+          message: "User registered successfully",
+          data: createUser,
+        });
       } else {
         res.status(500).send("Confirm Password not matched");
       }
@@ -74,7 +77,7 @@ module.exports = {
   },
   getUser: async (req, res) => {
     try {
-      const { id } = req.headers;
+      const { id } = req.body;
       console.log(id);
       const user = await User.findAll({
         attributes: { exclude: ["password"] },
@@ -87,7 +90,10 @@ module.exports = {
           id,
         },
       });
-      res.status(200).send(user);
+      res.status(200).send({
+        message: "User details",
+        data: user,
+      });
     } catch (error) {
       console.error(error.message);
       res.status(500).send("internal server error");
@@ -128,14 +134,14 @@ module.exports = {
   },
   addAddress: async (req, res) => {
     try {
-      const { address, city, state, pin_code, phone_no, userId } = req.body;
+      const { address, city, state, pin_code, phone_no } = req.body;
       const addAddress = await addresses.create({
         address,
         city,
         state,
         pin_code,
         phone_no,
-        userId,
+        userId: req.body.id,
       });
       res.status(200).send(addAddress);
     } catch (err) {
@@ -147,9 +153,8 @@ module.exports = {
     try {
       const data = req.body.addressArray;
       for (const addressId of data) {
-        const user_address = await Address.findOne({
+        const user_address = await addresses.findOne({
           where: {
-            user_id: req.params.id,
             id: addressId,
           },
         });

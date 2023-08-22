@@ -6,6 +6,7 @@ const Token = sequelize.define(
     userId: {
       type: Sequelize.INTEGER,
       allowNull: false,
+      unique: true,
     },
     token: {
       type: Sequelize.STRING(255),

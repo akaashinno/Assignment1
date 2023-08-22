@@ -22,7 +22,7 @@ const verifyToken = async (req, res, next) => {
 
       const minute = Math.abs(Math.round(timeDiff));
       if (minute > 60) {
-        req.body = { ...req.body, userId: findToken.userId };
+        req.body = { ...req.body, id: findToken.userId };
         next();
       } else {
         res.status(401).send({ message: "Sorry Session is expired" });
