@@ -1,5 +1,5 @@
 const User = require("../models/users");
-const Address = require("../models/address");
+const addresses = require("../models/address");
 const sequelize = require("../database/db");
 const bcrypt = require("bcrypt");
 let crypto = require("crypto");
@@ -9,41 +9,38 @@ module.exports = {
   addUser: async (req, res) => {
     try {
       const {
-        roleId,
         username,
         password,
         confirmPassword,
         emailId,
         firstName,
         lastName,
+        roleId,
       } = req.body;
-      if (password === confirmPassword) {
+      if (password == confirmPassword) {
         const salt = await bcrypt.genSalt(10);
         const securePassword = await bcrypt.hash(password, salt);
 
-        await User.create({
-          roleId,
+        const createUser = await User.create({
           username,
           password: securePassword,
           emailId,
           firstName,
           lastName,
+          roleId,
         });
-        res.status(200).send({
-          message: "data saved successfully",
-        });
+        res.status(200).send(createUser);
       } else {
         res.status(500).send("Confirm Password not matched");
       }
     } catch (err) {
-      // console.log("Error occurred:", err.status);
+      console.log(err);
       res.status(500).send(err);
     }
   },
 
   login: async (req, res) => {
     const { username, password } = req.body;
-    // console.log(username, password);
     try {
       const user = await User.findOne({
         where: {
@@ -56,21 +53,17 @@ module.exports = {
 
       const passwordCompare = await bcrypt.compare(password, user.password);
       if (passwordCompare) {
-        const { id: user_id, username: foundedUsername } = user;
-
         let token = crypto
           .createHash("md5")
-          .update(foundedUsername)
+          .update(`${username}${password}${process.env.SECRETKEY}`)
           .digest("hex");
-
-        const exTime = new Date();
-
-        await Access_Token.create({
-          user_id,
-          access_token: token,
-          expiry: exTime,
+        const expiryTime = new Date();
+        const createToken = await Access_Token.create({
+          userId: user.id,
+          token: token,
+          expiryDate: expiryTime,
         });
-        res.status(200).send({ access_token: token });
+        res.status(200).send({ access_token: createToken });
       } else {
         return res.status(400).json({ message: "Invalid credentials" });
       }
@@ -79,24 +72,22 @@ module.exports = {
       res.status(500).json({ message: "An login error occurred" });
     }
   },
-
   getUser: async (req, res) => {
     try {
-      const userId = req.params.id;
-      // console.log(userId);
-      const user = await User.findOne({
-        where: {
-          id: userId,
-        },
+      const { id } = req.headers;
+      console.log(id);
+      const user = await User.findAll({
         attributes: { exclude: ["password"] },
-        include: Address,
+        include: {
+          model: addresses,
+          as: "addressList",
+          attributes: ["address", "city", "state", "phone_no"],
+        },
+        where: {
+          id,
+        },
       });
-      // const userAddress = await Address.findAll({
-      //   where: {
-      //     user_id: userId,
-      //   },
-      // });
-      res.status(200).send({ user });
+      res.status(200).send(user);
     } catch (error) {
       console.error(error.message);
       res.status(500).send("internal server error");
@@ -137,21 +128,16 @@ module.exports = {
   },
   addAddress: async (req, res) => {
     try {
-      const { address, city, state, pinCode, phoneNum, type } = req.body;
-      const data = req.tokenData;
-
-      await Address.create({
-        user_id: data.user_id,
+      const { address, city, state, pin_code, phone_no, userId } = req.body;
+      const addAddress = await addresses.create({
         address,
         city,
         state,
-        pinCode,
-        phoneNum,
-        type,
+        pin_code,
+        phone_no,
+        userId,
       });
-      res.status(200).send({
-        message: "address saved successfully",
-      });
+      res.status(200).send(addAddress);
     } catch (err) {
       console.log("Error occurred:", err);
       res.status(500).send({ message: "Internal server error" });

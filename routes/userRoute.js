@@ -18,7 +18,7 @@ const {
 router.post("/add", addUser);
 router.post("/login", login);
 // router.get("/get", fetchUser, getUser);
-router.get("/get/:id", checkSession, getUser);
+router.get("/get/:id", verifyToken, getUser);
 router.delete("/delete", fetchUser, deleteUser);
 router.get("/list/:page", userList);
 router.post("/address", verifyToken, addAddress);
