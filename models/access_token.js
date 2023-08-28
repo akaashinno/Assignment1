@@ -13,8 +13,8 @@ const Token = sequelize.define(
       allowNull: false,
       unique: true,
     },
-    expiryDate: {
-      type: "TIMESTAMP",
+    expiry: {
+      type: Sequelize.FLOAT,
       allowNull: false,
     },
   },

@@ -14,14 +14,15 @@ const verifyToken = async (req, res, next) => {
     });
 
     if (findToken && findToken.token === token) {
-      const timing = findToken.expiryDate.getTime();
-      const currentTime = new Date().getTime();
+      const timing = findToken.expiry;
 
-      let timeDiff = (timing - currentTime) / 1000;
-      timeDiff /= 60;
+      const expiryHour = new Date().getHours();
+      const expiryMins = new Date().getMinutes();
+      let currentTime = expiryHour + expiryMins / 100;
 
-      const minute = Math.abs(Math.round(timeDiff));
-      if (minute > 60) {
+      let timeDiff = timing - currentTime;
+
+      if (timeDiff > 0) {
         req.body = { ...req.body, id: findToken.userId };
         next();
       } else {

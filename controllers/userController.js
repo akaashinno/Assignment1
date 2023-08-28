@@ -60,11 +60,14 @@ module.exports = {
           .createHash("md5")
           .update(`${username}${password}${process.env.SECRETKEY}`)
           .digest("hex");
-        const expiryTime = new Date();
+
+        const expiryHour = new Date().getHours() + 1;
+        const expiryMins = new Date().getMinutes();
+        let expiryTime = expiryHour + expiryMins / 100;
         const createToken = await Access_Token.create({
           userId: user.id,
           token: token,
-          expiryDate: expiryTime,
+          expiry: expiryTime,
         });
         res.status(200).send({ access_token: createToken });
       } else {
@@ -75,6 +78,26 @@ module.exports = {
       res.status(500).json({ message: "An login error occurred" });
     }
   },
+  // forRough: async (req, res) => {
+  //   try {
+  //     const expiryHour = new Date().getHours() + 1;
+  //     const expiryMins = new Date().getMinutes();
+  //     let expiryTime = expiryHour + expiryMins / 100;
+  //     await Access_Token.create({
+  //       userId: 56,
+  //       token: 899,
+  //       expiryDate: expiryTime,
+  //     });
+  //     res.status(200).send({
+  //       message: "done successfully",
+  //       data: expiryHour,
+  //       data1: expiryMins,
+  //       data2: expiryTime,
+  //     });
+  //   } catch (err) {
+  //     res.status(500).json({ message: err });
+  //   }
+  // },
   getUser: async (req, res) => {
     try {
       const { id } = req.body;
@@ -134,14 +157,15 @@ module.exports = {
   },
   addAddress: async (req, res) => {
     try {
-      const { address, city, state, pin_code, phone_no } = req.body;
+      const { address, city, state, pin_code, phone_no, userId } = req.body;
       const addAddress = await addresses.create({
         address,
         city,
         state,
         pin_code,
         phone_no,
-        userId: req.body.id,
+        userId,
+        // userId: req.body.id,
       });
       res.status(200).send(addAddress);
     } catch (err) {

@@ -12,6 +12,7 @@ const {
   userList,
   addAddress,
   deleteAddress,
+  // forRough,
   // forgotPassword,
 } = require("../controllers/userController");
 
@@ -28,5 +29,6 @@ router.delete("/delete_address/:id", checkSession, deleteAddress);
 //   "/verify-reset-password/:password-reset-token",
 //   verifyResetPassword
 // );
+// router.post("/rough", forRough);
 
 module.exports = router;
