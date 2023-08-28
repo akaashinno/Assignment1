@@ -61,14 +61,23 @@ module.exports = {
           .update(`${username}${password}${process.env.SECRETKEY}`)
           .digest("hex");
 
-        const expiryHour = new Date().getHours() + 1;
-        const expiryMins = new Date().getMinutes();
-        let expiryTime = expiryHour + expiryMins / 100;
-        const createToken = await Access_Token.create({
-          userId: user.id,
-          token: token,
-          expiry: expiryTime,
+        const userExist = Access_Token.findOne({
+          where: {
+            userId: user.id,
+          },
         });
+        if (!userExist) {
+          const expiryHour = new Date().getHours() + 1;
+          const expiryMins = new Date().getMinutes();
+          let expiryTime = expiryHour + expiryMins / 100;
+          const createToken = await Access_Token.create({
+            userId: user.id,
+            token: token,
+            expiry: expiryTime,
+          });
+        } else {
+          return res.status(400).json({ access_token: userExist.token });
+        }
         res.status(200).send({ access_token: createToken });
       } else {
         return res.status(400).json({ message: "Invalid credentials" });
