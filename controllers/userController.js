@@ -44,6 +44,14 @@ module.exports = {
 
   login: async (req, res) => {
     const { username, password } = req.body;
+
+    const generateToken = () => {
+      let token = crypto
+        .createHash("md5")
+        .update(`${username}${password}${process.env.SECRETKEY}`)
+        .digest("hex");
+    };
+
     try {
       const user = await User.findOne({
         where: {
@@ -56,10 +64,7 @@ module.exports = {
 
       const passwordCompare = await bcrypt.compare(password, user.password);
       if (passwordCompare) {
-        let token = crypto
-          .createHash("md5")
-          .update(`${username}${password}${process.env.SECRETKEY}`)
-          .digest("hex");
+        generateToken();
 
         const userExist = Access_Token.findOne({
           where: {
@@ -86,10 +91,7 @@ module.exports = {
           if (timeDiff > 0) {
             return res.status(400).json({ access_token: userExist.token });
           } else {
-            let token = crypto
-              .createHash("md5")
-              .update(`${username}${password}${process.env.SECRETKEY}`)
-              .digest("hex");
+            generateToken();
 
             const expiryHour = new Date().getHours() + 1;
             const expiryMins = new Date().getMinutes();
@@ -111,6 +113,7 @@ module.exports = {
       res.status(500).json({ message: "An login error occurred" });
     }
   },
+
   // forRough: async (req, res) => {
   //   try {
   //     const expiryHour = new Date().getHours() + 1;
