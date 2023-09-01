@@ -1,44 +1,44 @@
 const Sequelize = require("sequelize");
-const sequelize = require("../database/db");
-const Role = require("./roles");
 
-const User = sequelize.define("users", {
-  id: {
-    type: Sequelize.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  roleId: {
-    type: Sequelize.INTEGER,
-    references: {
-      model: Role,
-      key: "id",
+const sequelize = require("../database/db");
+const Role = require("../models/roles");
+const address = require("./address");
+
+const user = sequelize.define(
+  "user",
+  {
+    username: {
+      type: Sequelize.STRING(20),
+      unique: true,
+      allowNull: false,
+    },
+    password: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    emailId: {
+      type: Sequelize.STRING(50),
+      unique: true,
+      allowNull: false,
+    },
+    firstName: {
+      type: Sequelize.STRING(30),
+    },
+    roleId: {
+      type: Sequelize.INTEGER,
+      reference: {
+        model: Role,
+        key: "id",
+      },
     },
   },
-  username: {
-    type: Sequelize.STRING,
-    allowNull: false,
-    unique: true,
-  },
-  password: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  emailId: {
-    type: Sequelize.STRING,
-    allowNull: false,
-    unique: true,
-  },
-  firstName: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  lastName: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-});
+  {
+    freezeTableName: true,
+    timestamps: false,
+  }
+);
 
-User.belongsTo(Role, { foreignKey: "roleId" });
+user.hasMany(address, { as: "addressList" });
+address.belongsTo(user);
 
-module.exports = User;
+module.exports = user;
